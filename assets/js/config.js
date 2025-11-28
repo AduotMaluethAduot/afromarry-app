@@ -65,8 +65,13 @@ function getBasePath() {
 window.BASE_PATH = getBasePath();
 
 // Payment gateway configuration (from backend)
-window.PAYSTACK_PUBLIC_KEY = window.PAYSTACK_PUBLIC_KEY || 'pk_test_your_paystack_public_key';
-window.FLUTTERWAVE_PUBLIC_KEY = window.FLUTTERWAVE_PUBLIC_KEY || 'FLWPUBK_TEST-your_flutterwave_public_key';
+// Only set defaults if not already defined by backend
+if (typeof window.PAYSTACK_PUBLIC_KEY === 'undefined' || window.PAYSTACK_PUBLIC_KEY === null) {
+    window.PAYSTACK_PUBLIC_KEY = 'pk_test_your_paystack_public_key';
+}
+if (typeof window.FLUTTERWAVE_PUBLIC_KEY === 'undefined' || window.FLUTTERWAVE_PUBLIC_KEY === null) {
+    window.FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK_TEST-your_flutterwave_public_key';
+}
 
 // Helper functions for URL generation
 window.baseUrl = function(path) {

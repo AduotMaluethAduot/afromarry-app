@@ -235,7 +235,7 @@ class OrderController extends BaseController {
             $this->sendResponse(false, $e->getMessage(), null, 500);
         } finally {
             // End output buffering
-            ob_end_flush();
+            ob_end_clean();
         }
     }
     
