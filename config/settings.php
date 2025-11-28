@@ -7,6 +7,11 @@
 
 require_once 'database.php';
 
+// Load environment variables helper
+if (!function_exists('env')) {
+    require_once __DIR__ . '/env_loader.php';
+}
+
 /**
  * Get a setting value by key
  * 
@@ -167,10 +172,10 @@ function loadSettings() {
     define('TIMEZONE', $settings['timezone'] ?? 'UTC');
     
     // Payment settings
-    define('PAYSTACK_PUBLIC_KEY', $settings['paystack_public_key'] ?? '');
-    define('PAYSTACK_SECRET_KEY', $settings['paystack_secret_key'] ?? '');
-    define('FLUTTERWAVE_PUBLIC_KEY', $settings['flutterwave_public_key'] ?? '');
-    define('FLUTTERWAVE_SECRET_KEY', $settings['flutterwave_secret_key'] ?? '');
+    define('PAYSTACK_PUBLIC_KEY', $settings['paystack_public_key'] ?? env('PAYSTACK_PUBLIC_KEY', ''));
+    define('PAYSTACK_SECRET_KEY', $settings['paystack_secret_key'] ?? env('PAYSTACK_SECRET_KEY', ''));
+    define('FLUTTERWAVE_PUBLIC_KEY', $settings['flutterwave_public_key'] ?? env('FLUTTERWAVE_PUBLIC_KEY', ''));
+    define('FLUTTERWAVE_SECRET_KEY', $settings['flutterwave_secret_key'] ?? env('FLUTTERWAVE_SECRET_KEY', ''));
     
     // Bank transfer settings
     define('BANK_ACCOUNT_NAME', $settings['bank_account_name'] ?? '');

@@ -155,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="payment_method">Payment Method</label>
                     <select name="payment_method" id="payment_method" required>
                         <option value="">Select Payment Method</option>
+                        <option value="paystack">Paystack (Card/Bank Transfer)</option>
                         <option value="mobile_money">Mobile Money</option>
                         <option value="bank_transfer">Bank Transfer</option>
                         <option value="receipt_upload">Receipt Upload</option>
@@ -201,6 +202,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="instruction-card">
                             <h5>Receipt Upload</h5>
                             <p>If you've already made payment through other means, upload your receipt or proof of payment.</p>
+                        </div>
+                        
+                        <div class="instruction-card">
+                            <h5>Paystack Payment</h5>
+                            <p>If you paid using Paystack, the payment should already be verified automatically. If you're seeing this page, please contact support with your transaction reference.</p>
                         </div>
                     </div>
                 </div>

@@ -273,7 +273,7 @@ async function processPaystackPayment() {
             key: window.PAYSTACK_PUBLIC_KEY, // Use configured key only
             email: checkout.orderData.shipping.email,
             amount: checkout.orderData.total_amount * 100, // Convert to kobo
-            currency: checkout.orderData.currency || 'USD',
+            currency: checkout.orderData.currency || 'GHC',
             ref: orderData.order_reference,
             callback: function(response) {
                 console.log('[Checkout] Paystack callback:', response);
@@ -340,7 +340,7 @@ async function processFlutterwavePayment() {
             public_key: window.FLUTTERWAVE_PUBLIC_KEY, // Use configured key only
             tx_ref: orderData.order_reference,
             amount: checkout.orderData.total_amount,
-            currency: checkout.orderData.currency || "USD",
+            currency: checkout.orderData.currency || "GHC",
             payment_options: "card,mobilemoney,ussd",
             redirect_url: `${window.location.origin}${window.BASE_PATH}/pages/payment-verification.php?order_id=${orderData.order_id}`,
             customer: {
@@ -414,28 +414,51 @@ async function handlePaymentSuccess(paymentResponse, orderId) {
     try {
         hidePaymentModal();
         
-        // Update order status
-        const response = await fetch(actionUrl('orders.php'), {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                order_id: orderId,
-                status: 'paid'
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showMessage('Order created successfully! Please verify your payment.', 'success');
-            setTimeout(() => {
-                window.location.href = pageUrl(`payment-verification.php?order_id=${orderId}`);
-            }, 2000);
+        // For Paystack payments, verify the transaction first
+        if (checkout.paymentMethod === 'paystack') {
+            // Verify Paystack transaction
+            const verifyResponse = await fetch(actionUrl('paystack-verify-transaction.php'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    reference: paymentResponse.reference
+                })
+            });
+            
+            const verifyData = await verifyResponse.json();
+            
+            if (!verifyData.success) {
+                throw new Error('Payment verification failed: ' + verifyData.message);
+            }
+            
+            showMessage('Payment verified successfully!', 'success');
         } else {
-            throw new Error(data.message);
+            // For other payment methods, update order status
+            const response = await fetch(actionUrl('orders.php'), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    status: 'paid'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.message);
+            }
         }
+        
+        // Redirect to order success page
+        showMessage('Order created successfully!', 'success');
+        setTimeout(() => {
+            window.location.href = pageUrl(`order-success.php?order_id=${orderId}`);
+        }, 2000);
         
     } catch (error) {
         console.error('Payment success handling error:', error);
